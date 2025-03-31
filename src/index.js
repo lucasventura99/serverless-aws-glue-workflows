@@ -1,4 +1,4 @@
-const ServerlessAWSGlueWorkflows = require('./lib/plugin');
+import ServerlessAWSGlueWorkflows from './lib/plugin';
 
-module.exports = ServerlessAWSGlueWorkflows;
+export default ServerlessAWSGlueWorkflows;
   
