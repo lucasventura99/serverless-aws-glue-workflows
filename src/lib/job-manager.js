@@ -74,4 +74,4 @@ class JobManager {
   }
 }
 
-export default JobManager;
+module.exports = JobManager;

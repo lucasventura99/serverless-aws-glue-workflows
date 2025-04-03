@@ -1,37 +1,7 @@
-class WorkflowManager {
-  constructor(plugin) {
-    this.plugin = plugin;
-  }
-
-  validateWorkflowConfigurations(workflows) {
-    if (!workflows || Object.keys(workflows).length === 0) {
-      this.plugin.serverless.cli.log('No Glue Workflows configurations found.');
-      return;
-    }
-  }
-}
-
-class CrawlerManager {
-  constructor(plugin) {
-    this.plugin = plugin;
-  }
-}
-
-class JobManager {
-  constructor(plugin) {
-    this.plugin = plugin;
-  }
-}
-
-class ResourceGenerator {
-  constructor(plugin) {
-    this.plugin = plugin;
-  }
-
-  prepareWorkflowResources(workflows) {
-    // Implementation will be added later
-  }
-}
+const WorkflowManager = require('./src/lib/workflow-manager');
+const CrawlerManager = require('./src/lib/crawler-manager');
+const JobManager = require('./src/lib/job-manager');
+const ResourceGenerator = require('./src/lib/resource-generator');
 
 class ServerlessAWSGlueWorkflows {
   constructor(serverless, options) {
@@ -73,4 +43,4 @@ class ServerlessAWSGlueWorkflows {
   }
 }
 
-module.exports = ServerlessAWSGlueWorkflows; 
+module.exports = ServerlessAWSGlueWorkflows;

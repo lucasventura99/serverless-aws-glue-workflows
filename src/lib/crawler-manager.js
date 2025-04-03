@@ -74,4 +74,4 @@ class CrawlerManager {
   }
 }
 
-export default CrawlerManager;
+module.exports = CrawlerManager;
