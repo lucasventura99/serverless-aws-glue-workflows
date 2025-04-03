@@ -6,8 +6,12 @@ class JobManager {
   addJobsToResources(workflowName, workflow, resources) {
     if (!workflow.jobs || workflow.jobs.length === 0) return;
 
+    this.plugin.serverless.cli.log(`Adding ${workflow.jobs.length} jobs for workflow: ${workflowName}`);
+    
     workflow.jobs.forEach((job, index) => {
       const jobLogicalId = this.getJobLogicalId(workflowName, job.name);
+      
+      this.plugin.serverless.cli.log(`Creating job resource: ${job.name} (${jobLogicalId})`);
       
       resources[jobLogicalId] = {
         Type: 'AWS::Glue::Job',
@@ -38,6 +42,8 @@ class JobManager {
     const triggerLogicalId = this.getTriggerLogicalId(workflowName, job.name);
     const jobLogicalId = this.getJobLogicalId(workflowName, job.name);
 
+    this.plugin.serverless.cli.log(`Creating job trigger: ${triggerLogicalId} for job: ${job.name}`);
+    
     resources[triggerLogicalId] = {
       Type: 'AWS::Glue::Trigger',
       Properties: {
@@ -48,6 +54,7 @@ class JobManager {
           JobName: { Ref: jobLogicalId }
         }],
         Predicate: {
+          Logical: 'AND',
           Conditions: [{
             JobName: { Ref: this.getJobLogicalId(workflowName, previousJob.name) },
             State: 'SUCCEEDED'
@@ -55,6 +62,8 @@ class JobManager {
         }
       }
     };
+    
+    this.plugin.serverless.cli.log(`Job trigger created with predicate: ${JSON.stringify(resources[triggerLogicalId].Properties.Predicate)}`);
   }
 
   getJobLogicalId(workflowName, jobName) {

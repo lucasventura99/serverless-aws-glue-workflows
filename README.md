@@ -31,30 +31,50 @@ custom:
       description: My ETL Workflow
       tags:
         environment: production
+        project: data-analytics
+      # Optional: Skip auto-creation of crawler triggers
+      skipCrawlerTriggers: false
+      triggers:
+        - name: daily-trigger
+          type: SCHEDULED
+          schedule: cron(0 1 * * ? *)
+          enabled: true
+          description: "Triggers the workflow daily at 1 AM"
+          actions:
+            - jobName: my-job
+              arguments:
+                --source: s3://my-bucket/raw-data/
       crawlers:
-        - name: source-data-crawler
-          role: arn:aws:iam::123456789012:role/GlueCrawlerRole
-          databaseName: my_catalog_database
+        - name: my-crawler
+          role: ${self:provider.iam.role.name}
+          databaseName: my_database
           targets:
             S3Targets:
-              - Path: s3://my-bucket/source-data/
+              - Path: s3://my-bucket/raw-data/
           schedule: cron(0 1 * * ? *)
-          schemaChangePolicy:
-            UpdateBehavior: UPDATE_IN_DATABASE
-            DeleteBehavior: DEPRECATE_IN_DATABASE
-
       jobs:
-        - name: transform-data
-          role: arn:aws:iam::123456789012:role/GlueETLRole
+        - name: my-job
+          role: ${self:provider.iam.role.name}
           type: glueetl
-          scriptLocation: s3://my-bucket/scripts/transform.py
+          scriptLocation: s3://my-bucket/scripts/my-script.py
           workers: 2
           workerType: G.1X
           timeout: 60
           maxRetries: 1
           arguments:
-            --source: s3://source-bucket
-            --target: s3://target-bucket
+            --source: s3://my-bucket/raw-data/
+            --target: s3://my-bucket/processed-data/
+        - name: my-second-job
+          role: ${self:provider.iam.role.name}
+          type: glueetl
+          scriptLocation: s3://my-bucket/scripts/second-script.py
+          workers: 2
+          workerType: G.1X
+          timeout: 60
+          maxRetries: 1
+          arguments:
+            --source: s3://my-bucket/processed-data/
+            --target: s3://my-bucket/final-data/
 ```
 
 ### Configuration Options
@@ -96,6 +116,56 @@ The plugin automatically:
 2. Creates AWS CloudFormation resources for workflows, crawlers, jobs, and triggers
 3. Sets up job dependencies based on the order in the jobs array
 4. Configures crawler triggers to run before the first job in the workflow
+
+## Debugging
+The plugin includes detailed logging to help troubleshoot issues during deployment. You'll see logs for:
+
+- Workflow validation
+- Resource creation for jobs, crawlers, and triggers
+- Predicate configuration for triggers
+
+### Advanced Configuration Options Skip Crawler Triggers
+If you want to skip the automatic creation of crawler triggers, you can add the skipCrawlerTriggers option to your workflow:
+
+```yaml
+custom:
+  glueWorkflows:
+    myWorkflow:
+      description: My ETL Workflow
+      skipCrawlerTriggers: true
+      # rest of your configuration...
+ ```
+
+## IAM Role Configuration
+Make sure to configure the IAM role with the necessary permissions:
+
+```yaml
+provider:
+  name: aws
+  iam:
+    role:
+      name: ${self:service}-GlueServiceRole
+      managedPolicies:
+        - 'arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole'
+      statements:
+        - Effect: Allow
+          Action:
+            - glue:*
+            - s3:*
+            - iam:PassRole
+          Resource: "*"
+ ```
+## Troubleshooting
+If you encounter issues with trigger creation, check that:
+
+1. The Predicate configuration includes a Logical operator (AND/OR)
+2. Job and crawler references are correct
+3. The IAM role has sufficient permissions
+For more detailed logs during deployment, use the --verbose flag:
+
+```bash
+serverless deploy --verbose
+ ```
 
 ## License
 
