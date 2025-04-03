@@ -43,4 +43,4 @@ class ServerlessAWSGlueWorkflows {
   }
 }
 
-module.exports = ServerlessAWSGlueWorkflows;
+export default ServerlessAWSGlueWorkflows;
