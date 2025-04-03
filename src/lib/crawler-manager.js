@@ -6,8 +6,12 @@ class CrawlerManager {
   addCrawlersToResources(workflowName, workflow, resources) {
     if (!workflow.crawlers) return;
 
+    this.plugin.serverless.cli.log(`Adding ${workflow.crawlers.length} crawlers for workflow: ${workflowName}`);
+    
     workflow.crawlers.forEach((crawler, index) => {
       const crawlerLogicalId = this.getCrawlerLogicalId(workflowName, crawler.name);
+      
+      this.plugin.serverless.cli.log(`Creating crawler resource: ${crawler.name} (${crawlerLogicalId})`);
       
       resources[crawlerLogicalId] = {
         Type: 'AWS::Glue::Crawler',
@@ -29,7 +33,12 @@ class CrawlerManager {
 
       // Add trigger for crawler if it's the first crawler and there are jobs
       if (index === 0 && workflow.jobs && workflow.jobs.length > 0) {
-        this.addCrawlerTrigger(workflowName, crawler, resources);
+        // Check if we should skip auto-triggers based on configuration
+        if (workflow.skipCrawlerTriggers !== true) {
+          this.addCrawlerTrigger(workflowName, crawler, resources);
+        } else {
+          this.plugin.serverless.cli.log(`Skipping auto-trigger for crawler: ${crawler.name} (skipCrawlerTriggers is true)`);
+        }
       }
     });
   }
@@ -38,6 +47,8 @@ class CrawlerManager {
     const triggerLogicalId = this.getTriggerLogicalId(workflowName, crawler.name);
     const crawlerLogicalId = this.getCrawlerLogicalId(workflowName, crawler.name);
 
+    this.plugin.serverless.cli.log(`Creating crawler trigger: ${triggerLogicalId} for crawler: ${crawler.name}`);
+    
     resources[triggerLogicalId] = {
       Type: 'AWS::Glue::Trigger',
       Properties: {
@@ -48,6 +59,7 @@ class CrawlerManager {
           CrawlerName: { Ref: crawlerLogicalId }
         }],
         Predicate: {
+          Logical: 'AND', // Add the missing Logical operator
           Conditions: [{
             CrawlerName: { Ref: crawlerLogicalId },
             CrawlState: 'SUCCEEDED'
@@ -55,6 +67,8 @@ class CrawlerManager {
         }
       }
     };
+    
+    this.plugin.serverless.cli.log(`Crawler trigger created with predicate: ${JSON.stringify(resources[triggerLogicalId].Properties.Predicate)}`);
   }
 
   getCrawlerLogicalId(workflowName, crawlerName) {
