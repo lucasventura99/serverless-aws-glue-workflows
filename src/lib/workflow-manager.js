@@ -46,4 +46,4 @@ class WorkflowManager {
   }
 }
 
-export default WorkflowManager;
+module.exports = WorkflowManager;
