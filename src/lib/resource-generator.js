@@ -40,4 +40,4 @@ class ResourceGenerator {
   }
 }
 
-module.exports = ResourceGenerator;
+export default ResourceGenerator;
