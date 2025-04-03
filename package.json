@@ -1,8 +1,8 @@
 {
   "name": "serverless-aws-glue-workflows",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Serverless Framework plugin to add support for managing AWS Glue Workflows, simplifying the integration and deployment of ETL workflows in AWS.",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "publishConfig": {
     "access": "public"
