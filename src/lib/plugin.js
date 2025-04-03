@@ -1,7 +1,7 @@
-const WorkflowManager = require('./workflow-manager');
-const CrawlerManager = require('./crawler-manager');
-const JobManager = require('./job-manager');
-const ResourceGenerator = require('./resource-generator');
+import WorkflowManager from './workflow-manager.js';
+import CrawlerManager from './crawler-manager.js';
+import JobManager from './job-manager.js';
+import ResourceGenerator from './resource-generator.js';
 
 class ServerlessAWSGlueWorkflows {
   constructor(serverless, options) {
