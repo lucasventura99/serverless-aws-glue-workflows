@@ -100,8 +100,10 @@ class JobManager {
         ];
       }
 
+      const logicalOperator = job.logical && job.logical.trim() ? job.logical.trim() : "AND";
+      
       triggerResource.Properties.Predicate = {
-        Logical: job.logical || "AND",
+        Logical: logicalOperator,
         Conditions: conditions,
       };
 
