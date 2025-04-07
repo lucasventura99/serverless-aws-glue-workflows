@@ -44,26 +44,36 @@ class JobManager {
 
     this.plugin.serverless.cli.log(`Creating job trigger: ${triggerLogicalId} for job: ${job.name}`);
     
-    resources[triggerLogicalId] = {
+    // Check if this should be an on-demand trigger
+    const triggerType = job.triggerType || 'CONDITIONAL';
+    
+    const triggerResource = {
       Type: 'AWS::Glue::Trigger',
       Properties: {
         Name: `${workflowName}-${job.name}-trigger`,
-        Type: 'CONDITIONAL',
+        Type: triggerType,
         WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
         Actions: [{
           JobName: { Ref: jobLogicalId }
-        }],
-        Predicate: {
-          Logical: 'AND',
-          Conditions: [{
-            JobName: { Ref: this.getJobLogicalId(workflowName, previousJob.name) },
-            State: 'SUCCEEDED'
-          }]
-        }
+        }]
       }
     };
     
-    this.plugin.serverless.cli.log(`Job trigger created with predicate: ${JSON.stringify(resources[triggerLogicalId].Properties.Predicate)}`);
+    // Only add Predicate for CONDITIONAL triggers
+    if (triggerType === 'CONDITIONAL') {
+      triggerResource.Properties.Predicate = {
+        Logical: 'AND',
+        Conditions: [{
+          JobName: { Ref: this.getJobLogicalId(workflowName, previousJob.name) },
+          State: 'SUCCEEDED'
+        }]
+      };
+      this.plugin.serverless.cli.log(`Job trigger created with predicate: ${JSON.stringify(triggerResource.Properties.Predicate)}`);
+    } else {
+      this.plugin.serverless.cli.log(`Created ON_DEMAND trigger for job: ${job.name}`);
+    }
+    
+    resources[triggerLogicalId] = triggerResource;
   }
 
   getJobLogicalId(workflowName, jobName) {
