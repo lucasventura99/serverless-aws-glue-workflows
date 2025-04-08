@@ -40,7 +40,11 @@ class CrawlerManager {
 
       if (index === 0 && workflow.jobs && workflow.jobs.length > 0) {
         if (workflow.skipCrawlerTriggers !== true) {
+          // Create the crawler trigger
           this.addCrawlerTrigger(workflowName, crawler, resources);
+          
+          // Create a trigger to connect the crawler to the first job
+          this.addCrawlerToJobTrigger(workflowName, crawler, workflow.jobs[0], resources);
         } else {
           this.plugin.serverless.cli.log(
             `Skipping auto-trigger for crawler: ${crawler.name} (skipCrawlerTriggers is true)`
@@ -80,6 +84,42 @@ class CrawlerManager {
 
     this.plugin.serverless.cli.log(
       `Crawler trigger created as ON_DEMAND trigger for crawler: ${crawler.name}`
+    );
+  }
+
+  addCrawlerToJobTrigger(workflowName, crawler, job, resources) {
+    const triggerLogicalId = `GlueTrigger${this.normalizeResourceId(workflowName)}${this.normalizeResourceId(crawler.name)}ToJob${this.normalizeResourceId(job.name)}`;
+    const crawlerLogicalId = this.getCrawlerLogicalId(workflowName, crawler.name);
+    const jobLogicalId = `GlueJob${this.normalizeResourceId(workflowName)}${this.normalizeResourceId(job.name)}`;
+
+    this.plugin.serverless.cli.log(
+      `Creating crawler-to-job trigger: ${triggerLogicalId} from crawler: ${crawler.name} to job: ${job.name}`
+    );
+
+    resources[triggerLogicalId] = {
+      Type: "AWS::Glue::Trigger",
+      Properties: {
+        Name: `${workflowName}-${crawler.name}-to-${job.name}-trigger`,
+        Type: "CONDITIONAL",
+        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
+        Actions: [
+          {
+            JobName: { Ref: jobLogicalId },
+          },
+        ],
+        Predicate: {
+          Conditions: [
+            {
+              CrawlerName: { Ref: crawlerLogicalId },
+              CrawlState: "SUCCEEDED",
+            },
+          ],
+        },
+      },
+    };
+
+    this.plugin.serverless.cli.log(
+      `Created CONDITIONAL trigger from crawler: ${crawler.name} to job: ${job.name}`
     );
   }
 
