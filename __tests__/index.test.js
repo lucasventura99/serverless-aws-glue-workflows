@@ -17,6 +17,8 @@ describe('ServerlessAWSGlueWorkflows', () => {
 
   beforeEach(() => {
     
+    jest.clearAllMocks();
+    
     serverless = {
       getProvider: jest.fn().mockReturnValue({}),
       service: {
@@ -36,9 +38,6 @@ describe('ServerlessAWSGlueWorkflows', () => {
 
     options = {};
     plugin = new ServerlessAWSGlueWorkflows(serverless, options);
-
-    
-    jest.clearAllMocks();
   });
 
   describe('constructor', () => {
@@ -50,22 +49,10 @@ describe('ServerlessAWSGlueWorkflows', () => {
       expect(plugin.service).toBe(serverless.service);
       
       
-      expect(WorkflowManager).toHaveBeenCalledWith(expect.objectContaining({
-        serverless,
-        options
-      }));
-      expect(CrawlerManager).toHaveBeenCalledWith(expect.objectContaining({
-        serverless,
-        options
-      }));
-      expect(JobManager).toHaveBeenCalledWith(expect.objectContaining({
-        serverless,
-        options
-      }));
-      expect(ResourceGenerator).toHaveBeenCalledWith(expect.objectContaining({
-        serverless,
-        options
-      }));
+      expect(WorkflowManager).toHaveBeenCalledWith(plugin);
+      expect(CrawlerManager).toHaveBeenCalledWith(plugin);
+      expect(JobManager).toHaveBeenCalledWith(plugin);
+      expect(ResourceGenerator).toHaveBeenCalledWith(plugin);
       
       
       expect(plugin.hooks).toMatchObject({
