@@ -76,10 +76,10 @@ class CrawlerManager {
       Properties: {
         Name: `${workflowName}-${crawler.name}-trigger`,
         Type: "ON_DEMAND",
-        WorkflowName: this.getWorkflowLogicalId(workflowName),
+        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
         Actions: [
           {
-            CrawlerName: crawlerLogicalId,
+            CrawlerName: { Ref: crawlerLogicalId },
           },
         ],
       },
@@ -113,17 +113,17 @@ class CrawlerManager {
       Properties: {
         Name: `${workflowName}-${crawler.name}-to-${job.name}-trigger`,
         Type: "CONDITIONAL",
-        WorkflowName:this.getWorkflowLogicalId(workflowName),
+        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
         Actions: [
           {
-            JobName:jobLogicalId,
+            JobName: { Ref: jobLogicalId },
           },
         ],
         Predicate: {
           Logical: "AND",
           Conditions: [
             {
-              CrawlerName: crawlerLogicalId,
+              CrawlerName: { Ref: crawlerLogicalId },
               CrawlState: "SUCCEEDED",
             },
           ],
