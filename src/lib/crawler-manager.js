@@ -108,6 +108,7 @@ class CrawlerManager {
           },
         ],
         Predicate: {
+          Logical: "AND",
           Conditions: [
             {
               CrawlerName: { Ref: crawlerLogicalId },
