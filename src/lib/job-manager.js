@@ -82,6 +82,7 @@ class JobManager {
           if (condition.JobName && !condition.JobName.Ref) {
             return {
               ...condition,
+              LogicalOperator: "EQUALS",
               JobName: {
                 Ref: this.getJobLogicalId(workflowName, condition.JobName),
               },
@@ -104,7 +105,6 @@ class JobManager {
         job.logical && job.logical.trim() ? job.logical.trim() : "AND";
 
       triggerResource.Properties.Predicate = {
-        LogicalOperator: "EQUALS",
         Logical: logicalOperator,
         Conditions: conditions,
       };
