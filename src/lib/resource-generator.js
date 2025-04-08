@@ -6,7 +6,7 @@ class ResourceGenerator {
   prepareWorkflowResources(workflows) {
     if (!workflows || Object.keys(workflows).length === 0) return;
 
-    // Add debugging
+    
     this.plugin.serverless.cli.log(`Adding resources for workflows: ${Object.keys(workflows).join(', ')}`);
 
     const resources = this.plugin.service.resources = this.plugin.service.resources || {};
@@ -24,16 +24,16 @@ class ResourceGenerator {
         }
       };
 
-      // Add crawlers resources if defined
+      
       if (workflow.crawlers) {
         this.plugin.crawlerManager.addCrawlersToResources(workflowName, workflow, resources.Resources);
       }
 
-      // Add jobs and triggers resources
+      
       this.plugin.jobManager.addJobsToResources(workflowName, workflow, resources.Resources);
     }
 
-    // Add more debugging
+    
     this.plugin.serverless.cli.log(`Total resources added: ${Object.keys(resources.Resources).length}`);
   }
 

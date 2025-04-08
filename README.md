@@ -2,6 +2,23 @@
 
 A Serverless Framework plugin to add support for managing AWS Glue Workflows, simplifying the integration and deployment of ETL workflows in AWS.
 
+## Testing
+
+This plugin includes a test suite using Jest. To run the tests:
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+For more details about testing, see [TESTING.md](./TESTING.md).
+
 ## Features
 - Define and deploy AWS Glue Workflows directly in your Serverless configuration
 - Automate the creation of Glue jobs and triggers
