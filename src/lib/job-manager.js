@@ -62,10 +62,10 @@ class JobManager {
       Properties: {
         Name: `${workflowName}-${job.name}-trigger`,
         Type: triggerType,
-        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
+        WorkflowName: this.getWorkflowLogicalId(workflowName),
         Actions: [
           {
-            JobName: { Ref: jobLogicalId },
+            JobName: jobLogicalId,
           },
         ],
       },
@@ -100,8 +100,9 @@ class JobManager {
         ];
       }
 
-      const logicalOperator = job.logical && job.logical.trim() ? job.logical.trim() : "AND";
-      
+      const logicalOperator =
+        job.logical && job.logical.trim() ? job.logical.trim() : "AND";
+
       triggerResource.Properties.Predicate = {
         Logical: logicalOperator,
         Conditions: conditions,
