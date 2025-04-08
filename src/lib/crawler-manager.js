@@ -123,6 +123,7 @@ class CrawlerManager {
           Logical: "AND",
           Conditions: [
             {
+              LogicalOperator: "EQUALS",
               CrawlerName: { Ref: crawlerLogicalId },
               CrawlState: "SUCCEEDED",
             },
