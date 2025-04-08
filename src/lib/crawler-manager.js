@@ -40,11 +40,14 @@ class CrawlerManager {
 
       if (index === 0 && workflow.jobs && workflow.jobs.length > 0) {
         if (workflow.skipCrawlerTriggers !== true) {
-          // Create the crawler trigger
           this.addCrawlerTrigger(workflowName, crawler, resources);
-          
-          // Create a trigger to connect the crawler to the first job
-          this.addCrawlerToJobTrigger(workflowName, crawler, workflow.jobs[0], resources);
+
+          this.addCrawlerToJobTrigger(
+            workflowName,
+            crawler,
+            workflow.jobs[0],
+            resources
+          );
         } else {
           this.plugin.serverless.cli.log(
             `Skipping auto-trigger for crawler: ${crawler.name} (skipCrawlerTriggers is true)`
@@ -73,7 +76,7 @@ class CrawlerManager {
       Properties: {
         Name: `${workflowName}-${crawler.name}-trigger`,
         Type: "ON_DEMAND",
-        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
+        WorkflowName: this.getWorkflowLogicalId(workflowName),
         Actions: [
           {
             CrawlerName: crawlerLogicalId,
@@ -88,9 +91,18 @@ class CrawlerManager {
   }
 
   addCrawlerToJobTrigger(workflowName, crawler, job, resources) {
-    const triggerLogicalId = `GlueTrigger${this.normalizeResourceId(workflowName)}${this.normalizeResourceId(crawler.name)}ToJob${this.normalizeResourceId(job.name)}`;
-    const crawlerLogicalId = this.getCrawlerLogicalId(workflowName, crawler.name);
-    const jobLogicalId = `GlueJob${this.normalizeResourceId(workflowName)}${this.normalizeResourceId(job.name)}`;
+    const triggerLogicalId = `GlueTrigger${this.normalizeResourceId(
+      workflowName
+    )}${this.normalizeResourceId(crawler.name)}ToJob${this.normalizeResourceId(
+      job.name
+    )}`;
+    const crawlerLogicalId = this.getCrawlerLogicalId(
+      workflowName,
+      crawler.name
+    );
+    const jobLogicalId = `GlueJob${this.normalizeResourceId(
+      workflowName
+    )}${this.normalizeResourceId(job.name)}`;
 
     this.plugin.serverless.cli.log(
       `Creating crawler-to-job trigger: ${triggerLogicalId} from crawler: ${crawler.name} to job: ${job.name}`
@@ -101,17 +113,17 @@ class CrawlerManager {
       Properties: {
         Name: `${workflowName}-${crawler.name}-to-${job.name}-trigger`,
         Type: "CONDITIONAL",
-        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
+        WorkflowName:this.getWorkflowLogicalId(workflowName),
         Actions: [
           {
-            JobName: { Ref: jobLogicalId },
+            JobName:jobLogicalId,
           },
         ],
         Predicate: {
           Logical: "AND",
           Conditions: [
             {
-              CrawlerName: { Ref: crawlerLogicalId },
+              CrawlerName: crawlerLogicalId,
               CrawlState: "SUCCEEDED",
             },
           ],
