@@ -76,7 +76,7 @@ class CrawlerManager {
         WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
         Actions: [
           {
-            CrawlerName: { Ref: crawlerLogicalId },
+            CrawlerName: crawlerLogicalId,
           },
         ],
       },
