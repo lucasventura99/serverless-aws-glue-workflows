@@ -62,10 +62,10 @@ class JobManager {
       Properties: {
         Name: `${workflowName}-${job.name}-trigger`,
         Type: triggerType,
-        WorkflowName: this.getWorkflowLogicalId(workflowName),
+        WorkflowName: { Ref: this.getWorkflowLogicalId(workflowName) },
         Actions: [
           {
-            JobName: jobLogicalId,
+            JobName: { Ref: jobLogicalId },
           },
         ],
       },
@@ -82,6 +82,7 @@ class JobManager {
           if (condition.JobName && !condition.JobName.Ref) {
             return {
               ...condition,
+              LogicalOperator: "EQUALS",
               JobName: {
                 Ref: this.getJobLogicalId(workflowName, condition.JobName),
               },
