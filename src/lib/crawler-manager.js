@@ -1,3 +1,5 @@
+'use strict';
+
 class CrawlerManager {
   constructor(plugin) {
     this.plugin = plugin;

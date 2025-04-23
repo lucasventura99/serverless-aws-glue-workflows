@@ -1,3 +1,5 @@
+'use strict';
+
 class ResourceGenerator {
   constructor(plugin) {
     this.plugin = plugin;

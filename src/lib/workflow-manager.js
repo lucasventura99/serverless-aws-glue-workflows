@@ -1,3 +1,5 @@
+'use strict';
+
 class WorkflowManager {
   constructor(plugin) {
     this.plugin = plugin;
