@@ -1,3 +1,5 @@
+'use strict';
+
 class JobManager {
   constructor(plugin) {
     this.plugin = plugin;

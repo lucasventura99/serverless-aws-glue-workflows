@@ -1,3 +1,5 @@
+'use strict';
+
 const WorkflowManager = require('./src/lib/workflow-manager');
 const CrawlerManager = require('./src/lib/crawler-manager');
 const JobManager = require('./src/lib/job-manager');
